@@ -69,7 +69,6 @@ export function parseGpx(input: string | Document): ParsedWorkout | null {
   const segs = Array.from(doc.querySelectorAll("trkseg"));
   if (segs.length > 1) {
     let index = 0;
-    let distAcum = 0;
     for (const seg of segs) {
       const segPts = Array.from(seg.querySelectorAll("trkpt"));
       const pts: TrackPoint[] = segPts.map((pt) => ({
@@ -94,7 +93,6 @@ export function parseGpx(input: string | Document): ParsedWorkout | null {
         distanciaM: segMetrics.distanciaM,
         desnivelPosM: Math.round(segMetrics.desnivelPosM),
       });
-      distAcum += segMetrics.distanciaM;
       index++;
     }
   }

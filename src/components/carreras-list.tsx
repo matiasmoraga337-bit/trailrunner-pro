@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   Plus,
@@ -26,10 +25,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { listarCarreras, deleteCarrera, crearCarreraDesdeGpx } from "@/lib/db/carreras";
+import { deleteCarrera, crearCarreraDesdeGpx } from "@/lib/db/carreras";
 import { db } from "@/lib/db/db";
 import { formatDistancia, formatDesnivel } from "@/lib/format";
-import type { Race } from "@/lib/types";
 
 export function CarrerasList() {
   const carreras = useLiveQuery(() => db.carreras.orderBy("createdAt").reverse().toArray(), []);

@@ -9,7 +9,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ReferenceLine,
 } from "recharts";
 import { Loader2, Sparkles, Clock, Droplet, Battery, Flame } from "lucide-react";
 import { toast } from "sonner";
@@ -18,9 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatDuration, formatDistancia, formatDesnivel, formatRitmo } from "@/lib/format";
-import type { Race, PuntoElevacion, WorkoutSession } from "@/lib/types";
+import type { Race, PuntoElevacion } from "@/lib/types";
 import { useAjustes } from "@/lib/db/hooks";
-import { db } from "@/lib/db/db";
 
 interface AsesorResponse {
   fuente: "gemini" | "determinista";

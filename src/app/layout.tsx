@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     "Registro y planificación de entrenamientos de trail running, running, cinta, bici estática y fuerza. Importá sesiones de tu Suunto Race S, analizá rutas GPX y recibí asesoramiento de carreras con IA.",
   applicationName: "TrailRunner Pro",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "64x64", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Plus, Activity } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { SelectControl } from "@/components/select-control";
-import { SPORTS, type Sport, type WorkoutSession } from "@/lib/types";
-import { listarTodas, deleteSesion } from "@/lib/db/sesiones";
+import { SPORTS, type Sport } from "@/lib/types";
+import { deleteSesion } from "@/lib/db/sesiones";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/db";
 import {

@@ -33,8 +33,6 @@ import {
   type WorkoutSession,
 } from "@/lib/types";
 import {
-  listarSemana,
-  listarSesionesSemana,
   savePlanificada,
   deletePlanificada,
   updatePlanificada,
@@ -51,13 +49,13 @@ import {
   formatDesnivel,
 } from "@/lib/format";
 
-const DIAS = ["Lun", "Mar", "MiÃ©", "Jue", "Vie", "SÃ¡b", "Dom"];
-const DIAS_LARGO = ["Lunes", "Martes", "MiÃ©rcoles", "Jueves", "Viernes", "SÃ¡bado", "Domingo"];
+const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+const DIAS_LARGO = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 function getLunesSemana(d: Date): Date {
   const r = new Date(d);
   r.setHours(0, 0, 0, 0);
-  const dow = r.getDay(); // 0=dom, 1=lun...
+  const dow = r.getDay();
   const diff = dow === 0 ? -6 : 1 - dow;
   r.setDate(r.getDate() + diff);
   return r;
@@ -90,7 +88,7 @@ export function PlanificadorSemanal() {
     [desdeStr, hastaStr]
   ) ?? [];
 
-const sensors = useSensors(
+  const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
@@ -128,7 +126,6 @@ const sensors = useSensors(
     if (!destDiaIdx) return;
     const destIdxNum = parseInt(destDiaIdx, 10);
     if (isNaN(destIdxNum)) return;
-    // Buscar el item movido
     let item: PlannedWorkout | undefined;
     for (let i = 0; i < 7 && !item; i++) {
       item = planPorDia[i].find((p) => String(p.id) === itemId);
@@ -137,34 +134,29 @@ const sensors = useSensors(
     const nuevaFecha = semanaDias[destIdxNum];
     await updatePlanificada(item.id, { fecha: formatDateISO(nuevaFecha) });
     toast.success("Movido a " + DIAS_LARGO[destIdxNum]);
-    
   };
 
   const onBorrar = async (id: number) => {
     await deletePlanificada(id);
-    
   };
 
   const onToggleCompletada = async (p: PlannedWorkout) => {
     if (!p.id) return;
     await updatePlanificada(p.id, { completada: !p.completada });
-    
   };
 
   const onAplicarPlantilla = async (p: PlantillaSemana) => {
     if (
       !confirm(
-        `Esto reemplaza toda la semana con la plantilla "${p.nombre}". Â¿Continuar?`
+        `Esto reemplaza toda la semana con la plantilla "${p.nombre}". ¿Continuar?`
       )
     )
       return;
     await aplicarPlantilla(p, lunes);
     toast.success("Plantilla aplicada");
     setShowPlantillas(false);
-    
   };
 
-  // Totales de la semana (plan)
   const totalesPlan = useMemo(() => {
     let seg = 0;
     let dist = 0;
@@ -177,7 +169,6 @@ const sensors = useSensors(
     return { seg, dist, desn };
   }, [planificadas]);
 
-  // Totales de la semana (hecho)
   const totalesHecho = useMemo(() => {
     let seg = 0;
     let dist = 0;
@@ -195,7 +186,6 @@ const sensors = useSensors(
 
   return (
     <div className="space-y-5">
-      {/* Controles de semana */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Button
@@ -241,7 +231,7 @@ const sensors = useSensors(
             <ChevronRight className="h-4 w-4" />
           </Button>
           <span className="ml-2 text-sm font-medium capitalize">
-            {formatDateLarga(lunes)} â€” {formatDateLarga(semanaDias[6])}
+            {formatDateLarga(lunes)} — {formatDateLarga(semanaDias[6])}
           </span>
         </div>
         <Button variant="secondary" onClick={() => setShowPlantillas(true)}>
@@ -249,10 +239,9 @@ const sensors = useSensors(
         </Button>
       </div>
 
-      {/* Comparativa plan vs. hecho */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <TotalCard
-          label="DuraciÃ³n"
+          label="Duración"
           plan={formatDuration(totalesPlan.seg)}
           hecho={formatDuration(totalesHecho.seg)}
         />
@@ -269,7 +258,6 @@ const sensors = useSensors(
         />
       </div>
 
-      {/* Grilla de 7 dÃ­as */}
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
           {semanaDias.map((d, i) => (
@@ -287,7 +275,6 @@ const sensors = useSensors(
         </div>
       </DndContext>
 
-      {/* Modal plantillas */}
       <Dialog open={showPlantillas} onOpenChange={setShowPlantillas}>
         <DialogContent>
           <DialogHeader>
@@ -320,16 +307,12 @@ const sensors = useSensors(
         </DialogContent>
       </Dialog>
 
-      {/* Modal nuevo/editar plan del dÃ­a */}
       {editingDia !== null && (
         <NuevoPlanDialog
           diaIdx={editingDia}
           fecha={semanaDias[editingDia]}
           onClose={() => setEditingDia(null)}
-          onSaved={() => {
-            setEditingDia(null);
-            
-          }}
+          onSaved={() => setEditingDia(null)}
         />
       )}
     </div>
@@ -386,8 +369,8 @@ function DiaColumna({
           <div className="text-[10px] uppercase text-muted-foreground">Hecho</div>
           {sesionesDia.map((s) => (
             <div key={s.id} className="rounded bg-muted/50 px-1.5 py-0.5 text-xs">
-              {s.titulo} Â· {formatDuration(s.duracionSeg)}
-              {s.distanciaM > 0 && ` Â· ${formatDistancia(s.distanciaM)}`}
+              {s.titulo} · {formatDuration(s.duracionSeg)}
+              {s.distanciaM > 0 && ` · ${formatDistancia(s.distanciaM)}`}
             </div>
           ))}
         </div>
@@ -544,7 +527,7 @@ function NuevoPlanDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>DuraciÃ³n (min)</Label>
+              <Label>Duración (min)</Label>
               <Input
                 type="number"
                 value={duracionMin}
@@ -553,7 +536,7 @@ function NuevoPlanDialog({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>TÃ­tulo</Label>
+            <Label>Título</Label>
             <Input
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
