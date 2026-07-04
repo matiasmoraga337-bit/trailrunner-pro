@@ -1,0 +1,12 @@
+{
+  "name": "TrailRunner Pro",
+  "short_name": "TrailRunner",
+  "description": "Registro, planificación y análisis de entrenamientos de trail running y otros deportes.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": []
+}

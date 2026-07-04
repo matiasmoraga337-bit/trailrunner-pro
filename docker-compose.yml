@@ -1,0 +1,35 @@
+# TrailRunner Pro — entornos de desarrollo y producción.
+# Uso:
+#   Desarrollo (hot reload):  docker compose up trailrunner-dev
+#   Producción:               docker compose up trailrunner
+#   Build de prod:            docker compose build trailrunner
+
+services:
+  trailrunner-dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Monta el código fuente para hot reload. node_modules y .next viven en el contenedor.
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+      # LeeGEMINI_API_KEY desde .env.local si existe (opcional en desarrollo).
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL_FLASH: ${GEMINI_MODEL_FLASH:-gemini-2.0-flash}
+      GEMINI_MODEL_PRO: ${GEMINI_MODEL_PRO:-gemini-2.5-pro}
+    restart: unless-stopped
+
+  trailrunner:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env.local
+    restart: unless-stopped
