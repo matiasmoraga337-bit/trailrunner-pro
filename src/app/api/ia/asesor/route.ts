@@ -117,6 +117,23 @@ function formatPace(sKm: number): string {
   return `${m}:${String(s).padStart(2, "0")} /km`;
 }
 
+function extractJson(text: string): string {
+  // Quitar fences markdown (```json ... ```)
+  let cleaned = text
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+  // Buscar el objeto JSON mas externo
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("No se encontro JSON en la respuesta de la IA");
+  return match[0];
+}
+
+function parseIaResponse(text: string) {
+  const json = extractJson(text);
+  return JSON.parse(json);
+}
+
 // ── OLLAMA ──────────────────────────────────────────────
 async function asesorOllama(
   apiBase: string,
@@ -133,11 +150,13 @@ async function asesorOllama(
         {
           role: "system",
           content:
-            "Sos un coach de trail running. Respondé solo con JSON valido.",
+            "Sos un coach de trail running. Respondé UNICAMENTE con el JSON solicitado. " +
+            "No agregues saludos, explicaciones ni texto fuera del JSON. " +
+            "Empezá directamente con '{' y terminá con '}'.",
         },
         { role: "user", content: prompt },
       ],
-      temperature: 0.3,
+      temperature: 0.2,
       max_tokens: 2048,
     }),
   });
@@ -289,7 +308,7 @@ export async function POST(req: Request) {
     }
 
     if (resultText) {
-      const parsed = JSON.parse(resultText);
+      const parsed = parseIaResponse(resultText);
       return NextResponse.json({
         fuente: provider,
         modelo: process.env.OLLAMA_MODEL ?? process.env.GEMINI_MODEL_FLASH,
