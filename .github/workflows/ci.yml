@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
       - run: npx tsc --noEmit
 
   lint:
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
       - run: npm run lint
 
   test:
@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
       - run: npm test
 
   build:
@@ -57,7 +57,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
       - run: npm run build
 
   docker:
