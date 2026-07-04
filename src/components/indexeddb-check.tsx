@@ -1,23 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
-/** Detecta si IndexedDB esta disponible y muestra un aviso si no. */
 export function IndexedDBCheck({ children }: { children: React.ReactNode }) {
-  const [ok, setOk] = useState(true);
-
-  useEffect(() => {
+  const ok = useMemo(() => {
+    if (typeof window === "undefined") return true; // SSR
     try {
-      const req = window.indexedDB.open("__test__", 1);
-      req.onsuccess = () => {
-        req.result.close();
-        window.indexedDB.deleteDatabase("__test__");
-        setOk(true);
-      };
-      req.onerror = () => setOk(false);
-      req.onblocked = () => setOk(false);
+      return !!window.indexedDB;
     } catch {
-      setOk(false);
+      return false;
     }
   }, []);
 
@@ -34,16 +25,18 @@ export function IndexedDBCheck({ children }: { children: React.ReactNode }) {
             si tu navegador bloquea el almacenamiento local.
           </p>
           <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-            <li>• Probá abrir la app en una ventana normal (no incognito).</li>
             <li>
-              • En Firefox, verificá que{" "}
+              Proba abrir la app en una ventana normal (no incognito).
+            </li>
+            <li>
+              En Firefox, verifica que{" "}
               <code className="rounded bg-muted px-1">dom.indexedDB.enabled</code> este
               en <code className="rounded bg-muted px-1">true</code> en{" "}
               <code className="rounded bg-muted px-1">about:config</code>.
             </li>
             <li>
-              • En Safari, asegurate de que "Prevenir seguimiento entre sitios"
-              este desactivado.
+              En Safari, asegurate de que
+              &ldquo;Prevenir seguimiento entre sitios&rdquo; este desactivado.
             </li>
           </ul>
         </div>
