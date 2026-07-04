@@ -45,13 +45,37 @@ export async function parseFit(buffer: ArrayBuffer): Promise<ParsedWorkout | nul
 
   const sessionData = (sessionMsg?.data ?? {}) as FitData;
 
-  // Datos de la sesión
+  // Datos de la sesion
   const sport = sessionData.sport;
   const subSport = sessionData.sub_sport;
-  const totalElapsed = (sessionData.total_elapsed_time ?? 0) as number;
+
+  // Suunto guarda total_elapsed_time en milisegundos mientras la spec dice segundos.
+  // Heuristica: si > 86400 (24h en seg), esta en ms y dividimos por 1000.
+  const elapsedRaw = (sessionData.total_elapsed_time ?? 0) as number;
+  const totalElapsed = elapsedRaw > 86400 ? elapsedRaw / 1000 : elapsedRaw;
+
   const totalDistance = (sessionData.total_distance ?? 0) as number;
-  const totalAscent = (sessionData.total_ascent ?? 0) as number;
-  const totalDescent = (sessionData.total_descent ?? 0) as number;
+
+  // fit-decoder aplica /100 a total_ascent/total_descent (asume scale=2).
+  // Suunto usa scale=0 (metros crudos), por lo que el valor queda dividido de mas.
+  // Si el valor resultante es sospechosamente bajo para la distancia, lo multiplicamos x100.
+  let totalAscent = (sessionData.total_ascent ?? 0) as number;
+  let totalDescent = (sessionData.total_descent ?? 0) as number;
+
+  // Fallback: total_fractional_ascent/descent (no suele tener scaling en fit-decoder)
+  if (totalAscent <= 0) {
+    totalAscent = (sessionData.total_fractional_ascent ?? 0) as number;
+  }
+  if (totalDescent <= 0) {
+    totalDescent = (sessionData.total_fractional_descent ?? 0) as number;
+  }
+
+  // Si el D+ es ridiculamente bajo para la distancia, deshacer scaling
+  if (totalDistance > 0 && totalAscent > 0 && totalAscent < totalDistance / 10) {
+    totalAscent *= 100;
+    totalDescent *= 100;
+  }
+
   const avgHr = sessionData.avg_heart_rate;
   const maxHr = sessionData.max_heart_rate;
   const avgSpeed = (sessionData.avg_speed ?? 0) as number; // m/s
@@ -86,9 +110,11 @@ export async function parseFit(buffer: ArrayBuffer): Promise<ParsedWorkout | nul
   // Laps
   const laps: Lap[] = lapsMsgs.map((m, i) => {
     const d = (m.data ?? {}) as FitData;
+    const lapElapsedRaw = (d.total_elapsed_time ?? 0) as number;
+    const lapElapsed = lapElapsedRaw > 86400 ? lapElapsedRaw / 1000 : lapElapsedRaw;
     return {
       index: i,
-      tiempoSeg: Math.round((d.total_elapsed_time ?? 0)),
+      tiempoSeg: Math.round(lapElapsed),
       distanciaM: Math.round((d.total_distance ?? 0)),
       desnivelPosM: Math.round((d.total_ascent ?? 0)),
       desnivelNegM: Math.round((d.total_descent ?? 0)),
