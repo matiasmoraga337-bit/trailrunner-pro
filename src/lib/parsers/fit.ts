@@ -6,7 +6,8 @@ import type { ParsedWorkout } from "@/lib/parsers/common";
 import type { FitRecord } from "fit-decoder";
 
 // Datos crudos de un record FIT (parcial, campos variables).
-type FitData = Record<string, number | Date | undefined>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FitData = Record<string, any>;
 
 // Mapeo de sport / sub_sport de FIT → nuestro enum Sport.
 // Ref: FIT SDK globals (sport, sub_sport enums).
