@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -59,10 +59,20 @@ export function CarreraDetalle({ carrera }: { carrera: Race }) {
   const [asesor, setAsesor] = useState<AsesorResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Ritmo base sugerido: umbral del corredor si existe, default 6:00/km
-  useState(() => {
-    if (ajustes?.umbralTrailPaceSegKm) setRitmoBase(ajustes.umbralTrailPaceSegKm);
-  });
+  const initRef = useRef(false);
+  useEffect(() => {
+    if (!initRef.current && ajustes?.umbralTrailPaceSegKm) {
+      setRitmoBase(ajustes.umbralTrailPaceSegKm);
+      initRef.current = true;
+    }
+  }, [ajustes]);
+
+  const ritmoBaseMins = Math.floor(ritmoBase / 60);
+  const ritmoBaseSecs = ritmoBase % 60;
+
+  const setRitmoMmSs = (mins: number, secs: number) => {
+    setRitmoBase(mins * 60 + secs);
+  };
 
   const perfil: PuntoElevacion[] = carrera.perfilElevacion ?? [];
 
@@ -194,13 +204,30 @@ export function CarreraDetalle({ carrera }: { carrera: Race }) {
 
         <div className="flex flex-wrap items-end gap-3">
           <div className="space-y-1.5">
-            <Label>Ritmo base objetivo (s/km)</Label>
-            <Input
-              type="number"
-              value={ritmoBase}
-              onChange={(e) => setRitmoBase(Number(e.target.value))}
-              className="w-32"
-            />
+            <Label>Ritmo base objetivo (min/km)</Label>
+            <div className="flex items-center gap-1">
+              <Input
+                type="number"
+                min={3}
+                max={30}
+                step={1}
+                value={ritmoBaseMins}
+                onChange={(e) => setRitmoMmSs(Number(e.target.value) || 0, ritmoBaseSecs)}
+                className="w-16"
+                placeholder="min"
+              />
+              <span className="text-muted-foreground">:</span>
+              <Input
+                type="number"
+                min={0}
+                max={59}
+                step={5}
+                value={ritmoBaseSecs}
+                onChange={(e) => setRitmoMmSs(ritmoBaseMins, Number(e.target.value) || 0)}
+                className="w-16"
+                placeholder="seg"
+              />
+            </div>
             <p className="text-xs text-muted-foreground">
               {ritmoBase > 0 ? formatRitmo(ritmoBase) : "—"} en llano
             </p>

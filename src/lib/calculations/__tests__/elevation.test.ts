@@ -55,7 +55,7 @@ describe("calcularDistanciaYDesnivel", () => {
     expect(r.desnivelNegM).toBe(20);  // 120→100 (−20)
   });
 
-  it("filtra ruido: cambios <= 1m no cuentan", () => {
+  it("acumula todos los cambios sin filtrar (umbral=0)", () => {
     const pts: TrackPoint[] = [
       { lat: 0, lon: 0, ele: 100 },
       { lat: 0.001, lon: 0, ele: 100.5 },
@@ -63,10 +63,8 @@ describe("calcularDistanciaYDesnivel", () => {
       { lat: 0.003, lon: 0, ele: 100 },
     ];
     const r = calcularDistanciaYDesnivel(pts);
-    // 100→100.5: diff=0.5 < 1 → ignorado
-    // 100.5→99.2: diff=1.3 → D- 1.3
-    // 99.2→100: diff=0.8 < 1 → ignorado
-    expect(r.desnivelPosM).toBe(0);
+    // 100->100.5: +0.5, 100.5->99.2: -1.3, 99.2->100: +0.8
+    expect(r.desnivelPosM).toBeCloseTo(1.3, 1);
     expect(r.desnivelNegM).toBeCloseTo(1.3, 1);
   });
 });

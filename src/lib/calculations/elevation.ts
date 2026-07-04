@@ -42,7 +42,7 @@ export function calcularDistanciaYDesnivel(
   }
 
   // Desniveles (con filtro de ruido: solo cuenta cambios > 1m)
-  const UMBRAL_RUIDO = 1;
+  const UMBRAL_RUIDO = 0;
   let elePrev = puntos[0].ele ?? 0;
   for (let i = 1; i < puntos.length; i++) {
     const ele = puntos[i].ele ?? elePrev;
