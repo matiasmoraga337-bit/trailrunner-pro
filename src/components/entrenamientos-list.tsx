@@ -80,7 +80,7 @@ export function EntrenamientosList() {
             />
           </div>
         </div>
-        <Button render={<Link href="/entrenamientos/nuevo" />}>
+        <Button nativeButton={false} render={<Link href="/entrenamientos/nuevo" />}>
           <Plus className="h-4 w-4" /> Nuevo
         </Button>
       </div>
@@ -97,7 +97,7 @@ export function EntrenamientosList() {
           <p className="text-muted-foreground">
             Todavía no registraste entrenamientos.
           </p>
-          <Button variant="secondary" render={<Link href="/entrenamientos/nuevo" />}>
+          <Button nativeButton={false} variant="secondary" render={<Link href="/entrenamientos/nuevo" />}>
             <Plus className="h-4 w-4" /> Registrar el primero
           </Button>
         </div>

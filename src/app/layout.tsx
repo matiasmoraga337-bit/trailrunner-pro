@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NavBar } from "@/components/nav-bar";
 import { Toaster } from "@/components/ui/sonner";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { IndexedDBCheck } from "@/components/indexeddb-check";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,10 +55,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <NavBar />
-        {children}
-        <Toaster richColors position="top-right" />
-        <ServiceWorkerRegister />
+        <IndexedDBCheck>
+          <NavBar />
+          {children}
+          <Toaster richColors position="top-right" />
+          <ServiceWorkerRegister />
+        </IndexedDBCheck>
       </body>
     </html>
   );
