@@ -7,7 +7,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # ---------------------------------------------------------------------------
 # Etapa de desarrollo: hot reload (target "dev")
